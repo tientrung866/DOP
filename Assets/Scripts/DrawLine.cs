@@ -5,12 +5,8 @@ using UnityEngine.UIElements;
 
 public class DrawLine : MonoBehaviour
 {
-    public GameObject linePrefab;
-    public GameObject currentLine;
-    
-    public LineRenderer lineRenderer;
-    public EdgeCollider2D edgeCollier;
-    public List<Vector2> fingerPositions;
+    [SerializeField] private LineRenderer linePrefab;
+    private LineRenderer lineRenderer;
     
     // Start is called before the first frame update
     void Start()
@@ -22,38 +18,20 @@ public class DrawLine : MonoBehaviour
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
-        {
-            CreateLine();
-        }
+            lineRenderer = Instantiate(linePrefab);
 
         if (Input.GetMouseButton(0))
         {
-            Vector2 tempFingerPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-            if (Vector2.Distance(tempFingerPos, fingerPositions[fingerPositions.Count - 1]) > .1f)
+            Vector2 tempFingerPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (Vector2.Distance(tempFingerPos, lineRenderer.GetPosition(lineRenderer.positionCount- 1)) > .1f)
             {
-                UpdateLine(tempFingerPos);
+                AddPoint(tempFingerPos);
             }
         }
     }
-
-    void CreateLine()
+    void AddPoint(Vector2 newFingerPos)
     {
-        currentLine = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
-        lineRenderer = currentLine.GetComponent<LineRenderer>();
-        edgeCollier = currentLine.GetComponent<EdgeCollider2D>();
-        fingerPositions.Clear();
-        fingerPositions.Add(Camera.main.ScreenToViewportPoint(Input.mousePosition));
-        fingerPositions.Add(Camera.main.ScreenToViewportPoint(Input.mousePosition));
-        lineRenderer.SetPosition(0, fingerPositions[0]);
-        lineRenderer.SetPosition(1, fingerPositions[0]);
-        edgeCollier.points = fingerPositions.ToArray();
-    }
-
-    void UpdateLine(Vector2 newFingerPos)
-    {
-        fingerPositions.Add(newFingerPos);
         lineRenderer.positionCount++;
         lineRenderer.SetPosition(lineRenderer.positionCount - 1, newFingerPos);
-        edgeCollier.points = fingerPositions.ToArray();
     }
 }
