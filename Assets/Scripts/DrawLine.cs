@@ -7,6 +7,9 @@ using UnityEngine.UIElements;
 public class DrawLine : MonoBehaviour
 {
     [SerializeField] private LineRenderer linePrefab;
+    [SerializeField] private BoxCollider2D winBox;
+    [SerializeField] private CircleCollider2D dotS;
+    
     private LineRenderer lineRenderer;
     
     private EdgeCollider2D edgeColl;
@@ -44,24 +47,33 @@ public class DrawLine : MonoBehaviour
             }
 
             bool correct = true;
+
             /*phan thang thua*/
-//            foreach (Vector2 item in points)
-//            {
-//                if(!item bentrong)
-//                {
-//                    correct = false;
-//                    break;
-//                }
-//            }
-//
-//            if (correct = 0)
-//            {
-//                // thang
-//            }
-//            else if (correct = 1)
-//            {
-//                // thua
-//            }
+            /*foreach (Vector2 item in points)
+            {
+                if( !namtronghop )
+                {
+                    correct = false;
+                    break;
+                }
+            }
+
+            if (correct = 0)
+            {
+                // thang
+            }
+            else if (correct = 1)
+            {
+                // thua
+            }*/
+            
+            foreach (Vector2 item in points)
+            {
+                if ( winBox.IsTouching(dotS) )
+                {
+                    correct = false;
+                }
+            }
 
         }
     }
