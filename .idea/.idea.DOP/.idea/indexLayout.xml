@@ -23,6 +23,8 @@
     <explicitExcludes>
       <Path>.git</Path>
       <Path>.idea</Path>
+      <Path>BuildSettings:Q1.app</Path>
+      <Path>BuildSettings:Q2.app</Path>
       <Path>Library</Path>
       <Path>Logs</Path>
       <Path>Temp</Path>
