@@ -30,5 +30,15 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("Question01");
     }
+
+    public void HowToPlay()
+    {
+        SceneManager.LoadScene("1.HowToPlay");
+    }
+
+    public void BackToHome()
+    {
+        SceneManager.LoadScene("0.Start");
+    }
     
 }
