@@ -8,44 +8,40 @@ using UnityEngine.UIElements;
 
 public class DrawLine : MonoBehaviour
 {
-    /*[SerializeField] private GameObject questionImage;
-    [SerializeField] private GameObject answerImage;*/
-    
     public GameObject questionImage;
     public GameObject answerImage;
+    public GameObject checkBoxes;
     
     [SerializeField] private LineRenderer linePrefab;
     [SerializeField] private BoxCollider2D winBox;
-    //[SerializeField] private CircleCollider2D dotS;
-    
+
+    [SerializeField] private CircleCollider2D[] checkBox;
+
     private LineRenderer lineRenderer;
     
     private bool gameHasEnded = false;
     [SerializeField] private float restartDelay = 2f;
 
     private GameObject questImg;
+    private GameObject questImgCheck;
     
-    //Vector2 tempFingerPoses = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     private List<Vector2> points = new List<Vector2>();
+
+    private bool inside = true;
+    private bool allChecked = false;
+
+    private int countCheck;
     
-        /*if (Vector2.Distance(tempFingerPoses, lineRenderer.GetPosition(lineRenderer.positionCount - 1)) > .1f)
-    {
-        AddPoint(tempFingerPoses);
-        points.Add(tempFingerPoses);
-    }*/
-    
-    /*private EdgeCollider2D edgeColl;
-    private List<Vector2> points;*/
-    
-    private bool correct = true;
-    
-    // Start is called before the first frame update
     void Start()
     {
         questImg = Instantiate(questionImage, Vector3.zero, Quaternion.identity);
+        questImgCheck = Instantiate(checkBoxes, Vector3.zero, Quaternion.identity);
         
         winBox = questImg.GetComponentInChildren<BoxCollider2D>();
+        checkBox = questImgCheck.GetComponentsInChildren<CircleCollider2D>();
+
         Debug.Log("winBox size" + winBox.size);
+        Debug.Log("Checkboxes length: " + checkBox.Length);
     }
 
     // Update is called once per frame
@@ -67,62 +63,65 @@ public class DrawLine : MonoBehaviour
                 AddPoint(tempFingerPos);
                 points.Add(tempFingerPos);
             }
-            /*Debug.Log("points" + points);*/
         }
 
         if (Input.GetMouseButtonUp(0))
         {
-            /*winBox = questImg.GetComponentInChildren<BoxCollider2D>();
-            Debug.Log("winBox size" + winBox.size);*/
-            //Debug.Log("winBox size" + winBox.size);
-
-            /*phan thang thua*/
-            /*foreach (Vector2 item in points)
-            {
-                if( !namtronghop )
-                {
-                    correct = false;
-                    break;
-                }
-            }
-
-            if (correct = 0)
-            {
-                // thang
-            }
-            else if (correct = 1)
-            {
-                // thua
-            }*/
-            
             Debug.Log("number of points: " + points.Count);
+            countCheck = 0;
             
             foreach (Vector2 item in points)
             {
                 if (ToBeOutside(winBox,item))
                 {
                     Debug.Log("winBox size" + winBox.size);
-                    correct = false;
+                    inside = false;
                     break;
                 }
             }
 
-            if (correct)
+            for (int j=0; j < points.Count; j++)
             {
-                //thang
+                for (int i = 0; i < checkBox.Length; i++)
+                {
+                    if ( ToBeInside(checkBox[i],points[j]) && ToBeInside(checkBox[checkBox.Length - 1 - i],points[points.Count - 1 - j]) )
+                    {
+                        Debug.Log("ALL CHECKED!");
+                        allChecked = true;
+                        break;
+                    }
+                }
+            }
+            
+            foreach (Vector2 item in points)
+            {
+                //countCheck = 0;
+                for (int i = 0; i < checkBox.Length; i++)
+                {
+                    if (ToBeInside(checkBox[i], item))
+                    {
+                        countCheck++;
+                        continue;
+                    }
+                }
+                Debug.Log("Count checked: " + countCheck);
+            }
+
+            if (inside && allChecked && (countCheck >= checkBox.Length))
+            {
                 Debug.Log("correct");
                 //load answer
                 Destroy(questImg);
+                Destroy(questImgCheck);
                 Instantiate(answerImage, Vector3.zero, Quaternion.identity);
-                //load next
+                
                 NextQuestion();
             }
-            
-            if (!correct)
+
+            else
             {
-                //thua
                 Debug.Log("incorrect");
-                //reload scence
+                
                 EndGame();
             }
 
@@ -135,13 +134,13 @@ public class DrawLine : MonoBehaviour
         lineRenderer.positionCount++;
         lineRenderer.SetPosition(lineRenderer.positionCount - 1, newFingerPos);
     }
-    
-    /*public static bool IsInside(BoxCollider2D c, Vector2 point)
+
+    static public bool ToBeInside(CircleCollider2D test, Vector2 point)
     {
-        Vector2 closest = c.ClosestPoint(point);
-        // Because closest=point if point is inside - not clear from docs I feel
-        return closest == point;
-    }*/
+        bool inside;
+        inside = test.bounds.Contains(point);
+        return inside;
+    }
 
     static public bool ToBeOutside(BoxCollider2D test, Vector2 point)
     {
@@ -149,29 +148,21 @@ public class DrawLine : MonoBehaviour
         inside = test.bounds.Contains(point);
         return !inside;
     }
-    
-    static public bool IsOutside(BoxCollider2D test, Vector2 point)
+
+    private float BoundsContainedPercentage( Bounds obj, Bounds region )
     {
-        Vector2    center;
-        /*Vector2    direction;
-        Ray2D        ray;
-        RaycastHit2D hitInfo;*/
-        bool       hit;
+        var total = 1f;
  
-        // Use collider bounds to get the center of the collider. May be inaccurate
-        // for some colliders (i.e. MeshCollider with a 'plane' mesh)
-        center = test.bounds.center;
+        for ( var i = 0; i < 3; i++ )
+        {
+            var dist = obj.min[i] > region.center[i] ?
+                obj.max[i] - region.max[i] :
+                region.min[i] - obj.min[i];
  
-        // Cast a ray from point to center
-        // direction = center - point;
-        // ray = new Ray2D(point, direction);
-        
-        // tia chạy từ tâm cắt hình hộp 
-        hit = Physics2D.Raycast(center, point);
-        //hit = test.Raycast(ray, out hitInfo, direction.magnitude);
+            total *= Mathf.Clamp01(1f - dist / obj.size[i]);
+        }
  
-        // If we hit the collider, point is outside. So we return !hit
-        return hit;
+        return total;
     }
 
     public void EndGame()
@@ -200,7 +191,7 @@ public class DrawLine : MonoBehaviour
 
     private void LoadNew()
     {
-        SceneManager.LoadScene("Question02");
+        SceneManager.LoadScene("Question01Q1");
     }
     
 }

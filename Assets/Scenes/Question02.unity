@@ -251,7 +251,10 @@ MonoBehaviour:
     type: 3}
   answerImage: {fileID: 4099271684684987586, guid: 02846864718dc446d9f1782ee967c146,
     type: 3}
+  checkBoxes: {fileID: 5285162116657310351, guid: a548dc439fd1645a587c7da7e3022e8f,
+    type: 3}
   linePrefab: {fileID: 7842891023674733364, guid: 4666703d5eda249a6acacaa9927d90a1,
     type: 3}
   winBox: {fileID: 0}
+  checkBox: []
   restartDelay: 2

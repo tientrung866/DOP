@@ -10,9 +10,12 @@ public class DrawLineLastQuestion : MonoBehaviour
 {
     public GameObject questionImage;
     public GameObject answerImage;
+    public GameObject checkBoxes;
     
     [SerializeField] private LineRenderer linePrefab;
     [SerializeField] private BoxCollider2D winBox;
+
+    [SerializeField] private CircleCollider2D[] checkBox;
 
     private LineRenderer lineRenderer;
     
@@ -20,18 +23,25 @@ public class DrawLineLastQuestion : MonoBehaviour
     [SerializeField] private float restartDelay = 2f;
 
     private GameObject questImg;
+    private GameObject questImgCheck;
     
     private List<Vector2> points = new List<Vector2>();
+
+    private bool inside = true;
+    private bool allChecked = false;
+
+    private int countCheck;
     
-    private bool correct = true;
-    
-    // Start is called before the first frame update
     void Start()
     {
         questImg = Instantiate(questionImage, Vector3.zero, Quaternion.identity);
+        questImgCheck = Instantiate(checkBoxes, Vector3.zero, Quaternion.identity);
         
         winBox = questImg.GetComponentInChildren<BoxCollider2D>();
+        checkBox = questImgCheck.GetComponentsInChildren<CircleCollider2D>();
+
         Debug.Log("winBox size" + winBox.size);
+        Debug.Log("Checkboxes length: " + checkBox.Length);
     }
 
     // Update is called once per frame
@@ -57,35 +67,61 @@ public class DrawLineLastQuestion : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            
             Debug.Log("number of points: " + points.Count);
+            countCheck = 0;
             
             foreach (Vector2 item in points)
             {
                 if (ToBeOutside(winBox,item))
                 {
                     Debug.Log("winBox size" + winBox.size);
-                    correct = false;
+                    inside = false;
                     break;
                 }
             }
 
-            if (correct)
+            for (int j  = 0; j < points.Count; j++)
             {
-                //thang
+                for (int i = 0; i < checkBox.Length; i++)
+                {
+                    if ( ToBeInside(checkBox[i],points[j]) && ToBeInside(checkBox[checkBox.Length - 1 - i],points[points.Count - 1 - j]) )
+                    {
+                        Debug.Log("ALL CHECKED!");
+                        allChecked = true;
+                        break;
+                    }
+                }
+            }
+            
+            foreach (Vector2 item in points)
+            {
+                //countCheck = 0;
+                for (int i = 0; i < checkBox.Length; i++)
+                {
+                    if (ToBeInside(checkBox[i], item))
+                    {
+                        countCheck++;
+                        continue;
+                    }
+                }
+                Debug.Log("Count checked: " + countCheck);
+            }
+
+            if (inside && allChecked && (countCheck >= checkBox.Length))
+            {
                 Debug.Log("correct");
                 //load answer
                 Destroy(questImg);
+                Destroy(questImgCheck);
                 Instantiate(answerImage, Vector3.zero, Quaternion.identity);
-                //load next
+                
                 NextQuestion();
             }
-            
-            if (!correct)
+
+            else
             {
-                //thua
                 Debug.Log("incorrect");
-                //reload scence
+                
                 EndGame();
             }
 
@@ -99,11 +135,34 @@ public class DrawLineLastQuestion : MonoBehaviour
         lineRenderer.SetPosition(lineRenderer.positionCount - 1, newFingerPos);
     }
 
+    static public bool ToBeInside(CircleCollider2D test, Vector2 point)
+    {
+        bool inside;
+        inside = test.bounds.Contains(point);
+        return inside;
+    }
+
     static public bool ToBeOutside(BoxCollider2D test, Vector2 point)
     {
         bool inside;
         inside = test.bounds.Contains(point);
         return !inside;
+    }
+
+    private float BoundsContainedPercentage( Bounds obj, Bounds region )
+    {
+        var total = 1f;
+ 
+        for ( var i = 0; i < 3; i++ )
+        {
+            var dist = obj.min[i] > region.center[i] ?
+                obj.max[i] - region.max[i] :
+                region.min[i] - obj.min[i];
+ 
+            total *= Mathf.Clamp01(1f - dist / obj.size[i]);
+        }
+ 
+        return total;
     }
 
     public void EndGame()

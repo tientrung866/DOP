@@ -154,9 +154,12 @@ MonoBehaviour:
     type: 3}
   answerImage: {fileID: 5072521426094218094, guid: e9720a8fc8e924d14bae590a1cff5320,
     type: 3}
+  checkBoxes: {fileID: 2234767888177981587, guid: 0f3ff7e7a7db44251b47cc493a5d86f2,
+    type: 3}
   linePrefab: {fileID: 7842891023674733364, guid: 4666703d5eda249a6acacaa9927d90a1,
     type: 3}
   winBox: {fileID: 0}
+  checkBox: []
   restartDelay: 0.5
 --- !u!4 &294643452
 Transform:

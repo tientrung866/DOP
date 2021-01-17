@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Question01.unity
     guid: 7b83abbcf05c2460790c700431263ef4
   - enabled: 1
+    path: Assets/Scenes/Question01Q1.unity
+    guid: 30b05b244368d4ff19765726d1554058
+  - enabled: 1
     path: Assets/Scenes/Question02.unity
     guid: 56f6c1e20efa34477aaf0a02c486493b
   - enabled: 1

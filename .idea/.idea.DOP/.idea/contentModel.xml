@@ -9,11 +9,13 @@
             <e p="LICENSE.txt" t="Include" />
           </e>
         </e>
+        <e p="GameControllerLevels.cs" t="Include" />
         <e p="Scripts" t="Include">
           <e p="DrawLine.cs" t="Include" />
           <e p="DrawLineLastQuestion.cs" t="Include" />
           <e p="GameManager.cs" t="Include" />
           <e p="GroundBox.cs" t="Include" />
+          <e p="SimplePool.cs" t="Include" />
         </e>
         <e p="TextMesh Pro" t="Include">
           <e p="Examples &amp; Extras" t="Include">
